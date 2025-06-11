@@ -28,7 +28,14 @@ export class IconCanvas {
         });
         
         this.setupRoundedCanvas();
-        this.drawDefaultBackground();
+        
+        // Load glass overlay image
+        this.glassOverlay = new Image();
+        this.glassOverlay.src = '/src/img/glass-overlay.png';
+        this.glassOverlay.onload = () => {
+            this.drawDefaultBackground();
+            this.drawGlassOverlay();
+        };
     }
 
     createRoundedPath(ctx) {
@@ -72,6 +79,22 @@ export class IconCanvas {
     // Add method for initial background
     drawDefaultBackground() {
         this.drawAutomaticBackground();
+        this.drawGlassOverlay();
+    }
+
+    async drawGlassOverlay() {
+        if (this.glassOverlay.complete) {
+            this.ctx.save();
+            // Draw the overlay with its natural transparency
+            this.ctx.drawImage(
+                this.glassOverlay,
+                0,
+                0,
+                this.canvas.width,
+                this.canvas.height
+            );
+            this.ctx.restore();
+        }
     }
 
     clear() {
@@ -231,7 +254,7 @@ export class IconCanvas {
     async drawIcon(iconData) {
         this.clear();
         
-        // Draw background if fill is present
+        // Draw background
         const fill = iconData.metadata.fill;
         if (fill) {
             if (fill === 'automatic') {
@@ -248,29 +271,23 @@ export class IconCanvas {
                 this.ctx.restore();
             }
         } else {
-            // If no fill is specified, use automatic background
             this.drawAutomaticBackground();
         }
 
-        // For each group in the icon data
+        // Draw layers
         for (const group of iconData.metadata.groups) {
-            // Reverse the layers array to draw in correct order
             const layers = [...group.layers].reverse();
-            
-            // For each layer in the group
             for (const layer of layers) {
-                // Skip hidden layers
-                if (layer.hidden) {
-                    console.log(`Skipping hidden layer: ${layer.name}`);
-                    continue;
-                }
-
+                if (layer.hidden) continue;
                 const imageContent = iconData.assets[layer['image-name']];
                 if (imageContent) {
                     await this.drawImageLayer(imageContent, layer, group);
                 }
             }
         }
+
+        // Add glass overlay after all layers
+        await this.drawGlassOverlay();
     }
 
     async drawShadowedSVG(svgContent, shadow, x, y, width, height) {

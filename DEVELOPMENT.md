@@ -3,7 +3,7 @@
 ## Features
 - Loads and parses .icon files
 - Displays icon with proper border radius
-- Handles multiple asset layers (SVGs, JPGs, and PNGs) layers with correct z-ordering
+- Handles multiple asset layers (SVGs, JPGs, and PNGs) with correct z-ordering
 - Supports point-based translations
 - Maintains SVG aspect ratios
 - Exports to PNG at 2048x2048 resolution
@@ -11,6 +11,7 @@
 - Applies SVG fills from icon data
 - Implements shadow effects
 - Handles fill specializations (none, automatic)
+- Glass overlay effect (for icon, not assets)
 
 ## Implementation Details
 
@@ -18,6 +19,7 @@
 - Canvas size: 2048x2048 pixels (2x resolution)
 - Corner radius: ~538px (0.30590926 * canvas width)
 - Background: Supports solid colors, gradients, and automatic fills
+- Glass overlay texture on all rendered icons
 
 ### SVG Rendering
 - Preserves original aspect ratios
@@ -48,15 +50,36 @@
 - Layer opacity support
 - Additional export options
 - Layer blend modes implementation
-- Glass effect support
 - Platform-specific shape support
+- Dark-mode specific colors and settings
 
 ## Known Issues
 - Blend modes not working correctly
 - PNG files may have loading issues
 - Multiple icon loads may need canvas clearing improvement
+- Glass overlay path might need adjustment based on deployment
+
+## Project Structure
+```
+src/
+  ├── js/
+  │   ├── canvas.js
+  │   ├── iconLoader.js
+  │   └── main.js
+  ├── css/
+  │   └── styles.css
+  ├── img/
+  │   └── glass-overlay.png
+  └── index.html
+```
 
 ## Dependencies
 - JSZip for .icon file parsing
 - Native Canvas API for rendering
 - Web File API for file handling
+
+## Development Setup
+1. Clone the repository
+2. Ensure all assets are in correct directories
+3. Use a local server for development (e.g., `python -m http.server`)
+4. Test with various icon files

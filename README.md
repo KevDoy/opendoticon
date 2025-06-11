@@ -11,10 +11,11 @@ The openDotIcon is a web application that allows users to open, view, and export
 - Supports SVG translations and scaling
 - Preserves asset aspect ratios
 - Supports various color formats (sRGB, Display P3)
-- Implements shadow effects
+- Implements shadow effects with configurable opacity
 - Applies SVG fills from icon data
 - Handles fill specializations (none, automatic)
 - Exports to high-resolution PNG
+- Glass overlay effect on rendered icons
 
 ## Technical Implementation
 
@@ -22,6 +23,7 @@ The openDotIcon is a web application that allows users to open, view, and export
 - Canvas size: 2048x2048 pixels (2x resolution)
 - Corner radius: ~538px (0.30590926 * canvas width)
 - Background: Supports solid colors, gradients, and automatic fills
+- Glass overlay texture on all rendered icons
 
 ### Asset Handling
 - SVG: Preserves aspect ratios, handles viewBox configurations
@@ -29,6 +31,20 @@ The openDotIcon is a web application that allows users to open, view, and export
 - Supports point-based translations (converted to pixels)
 - Multi-layer shadow composition
 - Custom fill application for SVG elements
+
+## Project Structure
+```
+src/
+  ├── js/
+  │   ├── canvas.js      # Canvas rendering and drawing operations
+  │   ├── iconLoader.js  # Icon file parsing and asset loading
+  │   └── main.js        # Application entry point and UI handlers
+  ├── css/
+  │   └── styles.css     # Application styling
+  ├── img/
+  │   └── glass-overlay.png  # Glass effect overlay texture
+  └── index.html         # Main application page
+```
 
 ## JSON Structure
 The .icon format uses a JSON structure with these key properties:
@@ -92,20 +108,28 @@ The .icon format uses a JSON structure with these key properties:
 
 ## Setup Instructions
 1. Clone the repository
-2. Add the files to any web server
-3. Navigate to index.html
+2. Ensure all project assets are in their correct directories
+3. Use a local web server for development:
+   ```bash
+   python3 -m http.server
+   ```
+4. Navigate to `http://localhost:8000` in your browser
 
-The site is static, and can be deployed on GitHub Pages.
+The site is static and can be deployed on GitHub Pages or any web server.
 
 ## Known Issues
 - Blend modes not currently working
 - PNG files may have loading issues
 - Multiple icon loads may need canvas clearing improvement
+- Glass overlay path might need adjustment based on deployment
 
 ## Dependencies
 - JSZip for .icon file parsing
 - Native Canvas API for rendering
 - Web File API for file handling
+
+## Development
+For development setup and additional technical details, see [DEVELOPMENT.md](DEVELOPMENT.md)
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
