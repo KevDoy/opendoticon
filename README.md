@@ -6,12 +6,29 @@ The openDotIcon is a web application that allows users to open, view, and export
 ## Features
 - Opens and parses .icon files
 - Renders icons at 2048x2048 resolution (2x)
-- Only SVG, PNG, and JPG based assets are currently supported
-- Supports multiple SVG layers with z-ordering
-- Handles SVG translations and scaling
-- Preserves SVG aspect ratios
+- Displays icon with proper border radius (~538px)
+- Handles multiple asset layers (SVG, JPG, PNG) with correct z-ordering
+- Supports SVG translations and scaling
+- Preserves asset aspect ratios
 - Supports various color formats (sRGB, Display P3)
+- Implements shadow effects
+- Applies SVG fills from icon data
+- Handles fill specializations (none, automatic)
 - Exports to high-resolution PNG
+
+## Technical Implementation
+
+### Canvas Setup
+- Canvas size: 2048x2048 pixels (2x resolution)
+- Corner radius: ~538px (0.30590926 * canvas width)
+- Background: Supports solid colors, gradients, and automatic fills
+
+### Asset Handling
+- SVG: Preserves aspect ratios, handles viewBox configurations
+- JPG/PNG: Maintains original dimensions, proper binary data handling
+- Supports point-based translations (converted to pixels)
+- Multi-layer shadow composition
+- Custom fill application for SVG elements
 
 ## JSON Structure
 The .icon format uses a JSON structure with these key properties:
@@ -34,8 +51,21 @@ The .icon format uses a JSON structure with these key properties:
       },
       "fill": {
         "solid": "color-space:r,g,b,a"     // Layer-specific color fill
-      }
-    }]
+      },
+      "fill-specializations": [
+        {
+          "value": "none"                  // Use original colors
+        },
+        {
+          "appearance": "dark",
+          "value": "automatic"             // System-determined color
+        }
+      ]
+    }],
+    "shadow": {
+      "kind": "neutral",                   // Shadow type
+      "opacity": 0.5                       // Shadow opacity
+    }
   }]
 }
 ```
@@ -47,7 +77,7 @@ The .icon format uses a JSON structure with these key properties:
     "layers": [{
       "blend-mode": "overlay",             // Layer blend mode
       "glass": true                        // Glass effect toggle
-    }],,
+    }],
     "translucency": {
       "enabled": true,                     // Layer translucency toggle
       "value": 0.5                         // Translucency amount
@@ -66,6 +96,16 @@ The .icon format uses a JSON structure with these key properties:
 3. Navigate to index.html
 
 The site is static, and can be deployed on GitHub Pages.
+
+## Known Issues
+- Blend modes not currently working
+- PNG files may have loading issues
+- Multiple icon loads may need canvas clearing improvement
+
+## Dependencies
+- JSZip for .icon file parsing
+- Native Canvas API for rendering
+- Web File API for file handling
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
