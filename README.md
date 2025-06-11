@@ -1,4 +1,4 @@
-# Icon Viewer Project
+# openDotIcon - A viewer for Apple's .icon files
 
 ## Overview
 The openDotIcon is a web application that allows users to open, view, and export Apple's .icon format. The project features a canvas that renders icons based on specifications provided in the icon file's JSON data.
@@ -61,9 +61,11 @@ The .icon format uses a JSON structure with these key properties:
 ```
 
 ## Setup Instructions
-1. Clone the repository to your local machine.
-2. Open the project folder in your preferred code editor.
-3. Open `src/index.html` in a web browser to view the application.
+1. Clone the repository
+2. Add the files to any web server
+3. Navigate to index.html
+
+The site is static, and can be deployed on GitHub Pages.
 
 ## License
 This project is licensed under the MIT License. See the LICENSE file for more details.
