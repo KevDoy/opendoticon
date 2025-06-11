@@ -6,7 +6,7 @@ The openDotIcon is a web application that allows users to open, view, and export
 ## Features
 - Opens and parses .icon files
 - Renders icons at 2048x2048 resolution (2x)
-- Maintains precise 538px border radius
+- Only SVG based assets are currently supported
 - Supports multiple SVG layers with z-ordering
 - Handles SVG translations and scaling
 - Preserves SVG aspect ratios
