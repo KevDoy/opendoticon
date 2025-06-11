@@ -294,9 +294,9 @@ export class IconCanvas {
         // Draw main shadow
         shadowCtx.save();
         shadowCtx.shadowColor = `rgba(0, 0, 0, ${baseOpacity})`;
-        shadowCtx.shadowBlur = 20; // Increased blur for more softness
-        shadowCtx.shadowOffsetY = 0;
-        shadowCtx.shadowOffsetX = 0;
+        shadowCtx.shadowBlur = 40; // Increased blur for more softness
+        shadowCtx.shadowOffsetY = 8;
+        shadowCtx.shadowOffsetX = 8;
 
         // Draw overlay shadow (tighter, darker)
         overlayCtx.save();
@@ -333,13 +333,20 @@ export class IconCanvas {
             
             img.onload = async () => {
                 try {
-                    const parser = new DOMParser();
-                    const svgDoc = parser.parseFromString(imageContent, 'image/svg+xml');
-                    const svgElement = svgDoc.documentElement;
-                    
-                    // Get width/height from SVG
-                    const naturalWidth = parseInt(svgElement.getAttribute('width')) || 120;
-                    const naturalHeight = parseInt(svgElement.getAttribute('height')) || 120;
+                    let naturalWidth, naturalHeight;
+
+                    if (layer['image-name'].toLowerCase().endsWith('.svg')) {
+                        // SVG specific handling
+                        const parser = new DOMParser();
+                        const svgDoc = parser.parseFromString(imageContent, 'image/svg+xml');
+                        const svgElement = svgDoc.documentElement;
+                        naturalWidth = parseInt(svgElement.getAttribute('width')) || 120;
+                        naturalHeight = parseInt(svgElement.getAttribute('height')) || 120;
+                    } else {
+                        // For PNG, JPG, and other bitmap images
+                        naturalWidth = img.naturalWidth;
+                        naturalHeight = img.naturalHeight;
+                    }
 
                     // Calculate dimensions and position
                     const aspectRatio = naturalWidth / naturalHeight;
@@ -371,6 +378,20 @@ export class IconCanvas {
                         );
                     }
 
+                    // Save the current canvas state
+                    this.ctx.save();
+
+                    // Apply blend mode if specified before drawing
+                    if (layer['blend-mode']) {
+                        const blendMode = layer['blend-mode'];
+                        if (blendMode === 'overlay') {
+                            // For overlay blend mode
+                            this.ctx.globalCompositeOperation = 'overlay';
+                        } else {
+                            this.ctx.globalCompositeOperation = blendMode;
+                        }
+                    }
+
                     // Draw the actual image
                     this.ctx.drawImage(
                         img,
@@ -379,6 +400,9 @@ export class IconCanvas {
                         finalWidth,
                         finalHeight
                     );
+
+                    // Restore the canvas state (this will reset blend mode)
+                    this.ctx.restore();
 
                     URL.revokeObjectURL(img.src);
                     resolve();
@@ -393,12 +417,13 @@ export class IconCanvas {
                 reject(error);
             };
 
-            // Process image based on type
+            // Initial image load
             if (layer['image-name'].toLowerCase().endsWith('.svg')) {
                 const processedSVG = this.applySVGFill(imageContent, layer);
                 const blob = new Blob([processedSVG], { type: 'image/svg+xml' });
                 img.src = URL.createObjectURL(blob);
             } else {
+                // Handle binary data for JPG/PNG
                 const blob = new Blob([imageContent], { type: this.getImageMimeType(layer['image-name']) });
                 img.src = URL.createObjectURL(blob);
             }
@@ -433,7 +458,8 @@ export class IconCanvas {
             if (layer['fill-specializations']) {
                 const fillValue = layer['fill-specializations'][0].value;
                 if (fillValue === 'none' || fillValue === 'automatic') {
-                    element.setAttribute('fill', 'rgba(0, 0, 0, 1)');
+                    // Don't modify the fill - keep original SVG colors
+                    return;
                 }
             } else if (layer.fill && layer.fill.solid) {
                 const color = this.convertColorToRGBA(layer.fill.solid);
