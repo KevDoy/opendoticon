@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Viewer</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="upload-section">
+            <input type="file" id="iconFileInput" accept=".icon" class="file-input">
+            <label for="iconFileInput" class="file-label">Choose .icon file</label>
+            <button id="exportButton" class="file-label">Export PNG</button>
+        </div>
+        <div id="canvas-container">
+            <canvas id="iconCanvas" width="1024" height="1024"></canvas>
+        </div>
+    </div>
+    <script type="module" src="js/main.js"></script>
+</body>
+</html>

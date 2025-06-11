@@ -1,0 +1,41 @@
+/* This file is intentionally left blank. */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.upload-section {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.file-input {
+    display: none;
+}
+
+.file-label {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007AFF;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.file-label:hover {
+    background-color: #0056b3;
+}
+
+#canvas-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#iconCanvas {
+    max-width: 100%;
+    height: auto;
+    border-radius: 20%;
+}
