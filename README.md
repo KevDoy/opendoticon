@@ -6,7 +6,7 @@ The openDotIcon is a web application that allows users to open, view, and export
 ## Features
 - Opens and parses .icon files
 - Renders icons at 2048x2048 resolution (2x)
-- Only SVG based assets are currently supported
+- Only SVG, PNG, and JPG based assets are currently supported
 - Supports multiple SVG layers with z-ordering
 - Handles SVG translations and scaling
 - Preserves SVG aspect ratios
@@ -44,10 +44,10 @@ The .icon format uses a JSON structure with these key properties:
 ```json
 {
   "groups": [{
-    "shadow": {
-      "kind": "neutral",                   // Shadow type
-      "opacity": 0.5                       // Shadow opacity
-    },
+    "layers": [{
+      "blend-mode": "overlay",             // Layer blend mode
+      "glass": true                        // Glass effect toggle
+    }],,
     "translucency": {
       "enabled": true,                     // Layer translucency toggle
       "value": 0.5                         // Translucency amount

@@ -52,8 +52,9 @@ export class IconLoader {
                             })
                         );
                     } else if (fileName.toLowerCase().endsWith('.jpg') || 
-                             fileName.toLowerCase().endsWith('.jpeg')) {
-                        // Load JPG as binary
+                             fileName.toLowerCase().endsWith('.jpeg') ||
+                             fileName.toLowerCase().endsWith('.png')) {
+                        // Load binary files (JPG/PNG) as uint8array
                         assetPromises.push(
                             zipEntry.async("uint8array").then(content => {
                                 assets[fileName] = content;

@@ -378,21 +378,7 @@ export class IconCanvas {
                         );
                     }
 
-                    // Save the current canvas state
-                    this.ctx.save();
-
-                    // Apply blend mode if specified before drawing
-                    if (layer['blend-mode']) {
-                        const blendMode = layer['blend-mode'];
-                        if (blendMode === 'overlay') {
-                            // For overlay blend mode
-                            this.ctx.globalCompositeOperation = 'overlay';
-                        } else {
-                            this.ctx.globalCompositeOperation = blendMode;
-                        }
-                    }
-
-                    // Draw the actual image
+                    // Draw the image normally
                     this.ctx.drawImage(
                         img,
                         finalX,
@@ -400,9 +386,6 @@ export class IconCanvas {
                         finalWidth,
                         finalHeight
                     );
-
-                    // Restore the canvas state (this will reset blend mode)
-                    this.ctx.restore();
 
                     URL.revokeObjectURL(img.src);
                     resolve();
