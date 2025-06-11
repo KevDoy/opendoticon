@@ -259,32 +259,90 @@ export class IconCanvas {
             
             // For each layer in the group
             for (const layer of layers) {
+                // Skip hidden layers
+                if (layer.hidden) {
+                    console.log(`Skipping hidden layer: ${layer.name}`);
+                    continue;
+                }
+
                 const imageContent = iconData.assets[layer['image-name']];
                 if (imageContent) {
-                    await this.drawImageLayer(imageContent, layer);
+                    await this.drawImageLayer(imageContent, layer, group);
                 }
             }
         }
     }
 
-    async drawImageLayer(imageContent, layer) {
+    async drawShadowedSVG(svgContent, shadow, x, y, width, height) {
+        console.log('Drawing shadow with settings:', shadow);
+        
+        // Create temporary canvas for shadow composition
+        const shadowCanvas = document.createElement('canvas');
+        shadowCanvas.width = this.canvas.width;
+        shadowCanvas.height = this.canvas.height;
+        const shadowCtx = shadowCanvas.getContext('2d');
+
+        // Create a second canvas for overlay effect
+        const overlayCanvas = document.createElement('canvas');
+        overlayCanvas.width = this.canvas.width;
+        overlayCanvas.height = this.canvas.height;
+        const overlayCtx = overlayCanvas.getContext('2d');
+
+        // Base shadow settings with adjusted multiplier (0.15 instead of 0.3)
+        const baseOpacity = (shadow.opacity || 0.5) * 0.15;
+        
+        // Draw main shadow
+        shadowCtx.save();
+        shadowCtx.shadowColor = `rgba(0, 0, 0, ${baseOpacity})`;
+        shadowCtx.shadowBlur = 20; // Increased blur for more softness
+        shadowCtx.shadowOffsetY = 0;
+        shadowCtx.shadowOffsetX = 0;
+
+        // Draw overlay shadow (tighter, darker)
+        overlayCtx.save();
+        overlayCtx.shadowColor = `rgba(0, 0, 0, ${baseOpacity * 1.5})`; // 50% darker
+        overlayCtx.shadowBlur = 20; // Tighter blur
+        overlayCtx.shadowOffsetY = 4; // Half the offset
+        overlayCtx.shadowOffsetX = 0;
+
+        // Draw the content on both canvases
+        const img = new Image();
+        await new Promise((resolve) => {
+            img.onload = () => {
+                shadowCtx.drawImage(img, x, y, width, height);
+                overlayCtx.drawImage(img, x, y, width, height);
+                resolve();
+            };
+            img.src = svgContent;
+        });
+
+        shadowCtx.restore();
+        overlayCtx.restore();
+
+        // Composite both shadow layers onto main canvas
+        this.ctx.globalAlpha = 1;
+        this.ctx.drawImage(shadowCanvas, 0, 0);
+        this.ctx.globalAlpha = 0.3; // Adjust overlay opacity
+        this.ctx.drawImage(overlayCanvas, 0, 0);
+        this.ctx.globalAlpha = 1;
+    }
+
+    async drawImageLayer(imageContent, layer, group) {
         return new Promise((resolve, reject) => {
             const img = new Image();
             
-            img.onload = () => {
+            img.onload = async () => {
                 try {
                     const parser = new DOMParser();
                     const svgDoc = parser.parseFromString(imageContent, 'image/svg+xml');
                     const svgElement = svgDoc.documentElement;
                     
-                    // Get width/height from SVG (defaults to 120 if not specified)
+                    // Get width/height from SVG
                     const naturalWidth = parseInt(svgElement.getAttribute('width')) || 120;
                     const naturalHeight = parseInt(svgElement.getAttribute('height')) || 120;
 
-                    // Calculate aspect ratio
+                    // Calculate dimensions and position
                     const aspectRatio = naturalWidth / naturalHeight;
-
-                    // Scale based on natural width and maintain aspect ratio
                     const scale = layer.position?.scale || 1;
                     const finalWidth = naturalWidth * scale * 2;
                     const finalHeight = finalWidth / aspectRatio;
@@ -293,34 +351,35 @@ export class IconCanvas {
                     const x = (this.canvas.width - finalWidth) / 2;
                     const y = (this.canvas.height - finalHeight) / 2;
 
-                    // Convert points to pixels (2x for retina)
+                    // Apply translations
                     const [tx, ty] = layer.position?.['translation-in-points'] || [0, 0];
                     const pixelTranslateX = tx * 2;
                     const pixelTranslateY = ty * 2;
 
-                    console.log('Drawing details:', {
-                        imageName: layer['image-name'],
-                        naturalSize: `${naturalWidth}x${naturalHeight}`,
-                        aspectRatio,
-                        scale,
-                        finalSize: `${finalWidth}x${finalHeight}`,
-                        centerPosition: `${x},${y}`,
-                        translation: {
-                            points: [tx, ty],
-                            pixels: [pixelTranslateX, pixelTranslateY]
-                        }
-                    });
+                    const finalX = x + pixelTranslateX;
+                    const finalY = y + pixelTranslateY;
 
-                    this.ctx.save();
+                    // Draw shadow first if group has shadow
+                    if (group && group.shadow) {
+                        await this.drawShadowedSVG(
+                            img.src,
+                            group.shadow,
+                            finalX,
+                            finalY,
+                            finalWidth,
+                            finalHeight
+                        );
+                    }
+
+                    // Draw the actual image
                     this.ctx.drawImage(
                         img,
-                        x + pixelTranslateX,
-                        y + pixelTranslateY,
+                        finalX,
+                        finalY,
                         finalWidth,
                         finalHeight
                     );
-                    this.ctx.restore();
-                    
+
                     URL.revokeObjectURL(img.src);
                     resolve();
                 } catch (error) {
@@ -391,6 +450,33 @@ export class IconCanvas {
         const doc = parser.parseFromString(svgContent, 'image/svg+xml');
         const svg = doc.documentElement;
         return svg.getAttribute('viewBox') || 'none';
+    }
+}
+
+class SVGPathAnalyzer {
+    constructor(svgContent) {
+        this.parser = new DOMParser();
+        this.svgDoc = this.parser.parseFromString(svgContent, "image/svg+xml");
+    }
+
+    getOuterPaths() {
+        // Get all path elements
+        const paths = this.svgDoc.querySelectorAll('path');
+        const outerPaths = [];
+
+        paths.forEach(path => {
+            const d = path.getAttribute('d');
+            const bbox = path.getBBox();
+            
+            // Store path data and its bounding box
+            outerPaths.push({
+                pathData: d,
+                bounds: bbox,
+                fill: path.getAttribute('fill')
+            });
+        });
+
+        return outerPaths;
     }
 }
 
