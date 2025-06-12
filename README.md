@@ -3,6 +3,13 @@
 ## Overview
 The openDotIcon is a web application that allows users to open, view, and export Apple's .icon format. The project features a canvas that renders icons based on specifications provided in the icon file's JSON data.
 
+> [!WARNING]
+> **Project Status: In Heavy Development**
+>
+> This project is actively under development. Core functionality is only **partially implemented**, and the **UI is minimal** to facilitate testing and iteration.
+>
+> Features may be unstable or incomplete. Use with caution and expect frequent changes.
+
 ## Features
 - Opens and parses .icon files
 - Renders icons at 2048x2048 resolution (2x)
