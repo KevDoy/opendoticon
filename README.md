@@ -1,3 +1,5 @@
+<img src="https://raw.githubusercontent.com/KevDoy/opendoticon/refs/heads/main/src/favicon.png" height="70" alt>
+
 # openDotIcon - A viewer for Apple's .icon files
 
 ## Overview
