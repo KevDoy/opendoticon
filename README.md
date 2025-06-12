@@ -11,7 +11,7 @@ The openDotIcon is a web application that allows users to open, view, and export
 - Supports SVG translations and scaling
 - Preserves asset aspect ratios
 - Supports various color formats (sRGB, Display P3)
-- Implements shadow effects with configurable opacity
+- Implements shadow effects
 - Applies SVG fills from icon data
 - Handles fill specializations (none, automatic)
 - Exports to high-resolution PNG
@@ -115,7 +115,7 @@ The .icon format uses a JSON structure with these key properties:
    ```
 4. Navigate to `http://localhost:8000` in your browser
 
-The site is static and can be deployed on GitHub Pages or any web server.
+The site is static and can be deployed on GitHub Pages or virtually any web server.
 
 ## Known Issues
 - Blend modes not currently working
