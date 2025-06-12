@@ -25,6 +25,7 @@ The openDotIcon is a web application that allows users to open, view, and export
 - Handles fill specializations (none, automatic)
 - Exports to high-resolution PNG
 - Glass overlay effect on rendered icons
+- Converting .icons to png
 
 ## Technical Implementation
 
