@@ -31,7 +31,7 @@ export class IconCanvas {
         
         // Load glass overlay image
         this.glassOverlay = new Image();
-        this.glassOverlay.src = '/src/img/glass-overlay.png';
+        this.glassOverlay.src = './img/glass-overlay.png';
         this.glassOverlay.onload = () => {
             this.drawDefaultBackground();
             this.drawGlassOverlay();
