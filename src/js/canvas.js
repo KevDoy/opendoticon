@@ -357,8 +357,16 @@ export class IconCanvas {
                         const parser = new DOMParser();
                         const svgDoc = parser.parseFromString(imageContent, 'image/svg+xml');
                         const svgElement = svgDoc.documentElement;
-                        naturalWidth = parseInt(svgElement.getAttribute('width')) || 120;
-                        naturalHeight = parseInt(svgElement.getAttribute('height')) || 120;
+                        
+                        // Get dimensions from viewBox if available, otherwise from width/height attributes
+                        const viewBox = svgElement.getAttribute('viewBox')?.split(' ').map(Number);
+                        if (viewBox && viewBox.length === 4) {
+                            naturalWidth = viewBox[2];  // viewBox width
+                            naturalHeight = viewBox[3]; // viewBox height
+                        } else {
+                            naturalWidth = parseInt(svgElement.getAttribute('width')) || svgElement.width.baseVal.value;
+                            naturalHeight = parseInt(svgElement.getAttribute('height')) || svgElement.height.baseVal.value;
+                        }
                     } else {
                         // For PNG, JPG, and other bitmap images
                         naturalWidth = img.naturalWidth;
@@ -370,6 +378,25 @@ export class IconCanvas {
                     const scale = layer.position?.scale || 1;
                     const finalWidth = naturalWidth * scale * 2;
                     const finalHeight = finalWidth / aspectRatio;
+
+                    // Debug SVG scaling
+                    console.log('Layer scaling debug:', {
+                        imageName: layer['image-name'],
+                        naturalWidth,
+                        naturalHeight,
+                        scale: layer.position?.scale || 1,
+                        calculatedWidth: naturalWidth * (layer.position?.scale || 1) * 2,
+                        canvasWidth: this.canvas.width,
+                        canvasHeight: this.canvas.height
+                    });
+
+                    // Debug final dimensions
+                    console.log('Final dimensions:', {
+                        width: finalWidth,
+                        height: finalHeight,
+                        aspectRatio,
+                        exceedsCanvas: finalWidth > this.canvas.width || finalHeight > this.canvas.height
+                    });
 
                     // Calculate center position
                     const x = (this.canvas.width - finalWidth) / 2;
